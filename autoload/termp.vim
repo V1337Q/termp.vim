@@ -15,6 +15,7 @@ function! termp#open() abort
   let height = float2nr(&lines   * 0.6)
   let line   = (&lines   - height) / 2
   let col    = (&columns - width)  / 2
+  let toptitle    = 'termp'
 
   let s:popup_id = popup_create([], {
         \ 'line': line,
@@ -23,7 +24,7 @@ function! termp#open() abort
         \ 'minheight': height,
         \ 'border': [1,1,1,1],
         \ 'borderchars': ['─','│','─','│','┌','┐','┘','└'],
-        \ 'title': ' termp ',
+        \ 'title': toptitle,
         \ 'wrap': v:true,
         \ 'mapping': 0,
         \ 'filter': 'termp#filter',
@@ -31,7 +32,7 @@ function! termp#open() abort
         \ })
 
   let s:log = ['Type a shell command and press <Enter>.',
-        \ 'Type "clear" to reset, "exit" to close.',
+        \ 'Type "clear" to reset, "exit" or <C-c to close.',
         \ '',
         \ '> ']
   call popup_settext(s:popup_id, s:log)
@@ -45,7 +46,7 @@ function! termp#filter(id, key) abort
       return 1
     elseif s:current_input ==# 'clear'
       let s:log = ['Type a shell command and press <Enter>.',
-            \ 'Type "clear" to reset, "exit" to close.',
+            \ 'Type "clear" to reset, "exit" or <C-c> to close.',
             \ '', '> ']
       let s:current_input = ''
       call popup_settext(a:id, s:log)
