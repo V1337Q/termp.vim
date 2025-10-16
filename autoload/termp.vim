@@ -6,16 +6,35 @@ let g:loaded_termp = 1
 let s:popup_id = -1
 let s:current_input = ''
 
+function! s:SetupHighlights()
+  "Didn't know if this actually works. But imma push anyway. 
+    let normal_bg = synIDattr(synIDtrans(hlID("Normal")), "bg#")
+    let normal_fg = synIDattr(synIDtrans(hlID("Normal")), "fg#")
+    let comment_fg = synIDattr(synIDtrans(hlID("Comment")), "fg#")
+    let constant_fg = synIDattr(synIDtrans(hlID("Constant")), "fg#")
+    
+    let title_color = empty(constant_fg) ? (empty(normal_fg) ? '#87CEEB' : normal_fg) : constant_fg
+    let border_color = empty(comment_fg) ? (empty(normal_fg) ? '#666666' : normal_fg) : comment_fg
+    let bg_color = empty(normal_bg) ? 'NONE' : normal_bg
+    let text_color = empty(normal_fg) ? '#FFFFFF' : normal_fg
+    
+    execute 'highlight TermPopupTitle guifg=' . title_color . ' gui=bold'
+    execute 'highlight TermPopupBorder guifg=' . border_color
+    execute 'highlight TermPopupBg guibg=' . bg_color . ' guifg=' . text_color
+endfunction
+
 function! termp#open() abort
   if s:popup_id != -1
     call popup_close(s:popup_id)
   endif
 
+  call s:SetupHighlights()
+
   let width  = float2nr(&columns * 0.6)
   let height = float2nr(&lines   * 0.6)
   let line   = (&lines   - height) / 2
   let col    = (&columns - width)  / 2
-  let toptitle    = '  termp.vim '
+  let toptitle    = '  termp '
   let user_directory = expand('~')
   let full_title = toptitle . '   ' . user_directory
 
@@ -31,13 +50,14 @@ function! termp#open() abort
         \ 'mapping': 0,
         \ 'filter': 'termp#filter',
         \ 'callback': 'termp#close_cb',
-        \ 'highlight': 'PopupColor'  
+        \ 'highlight': 'TermPopupBg',
+        \ 'borderhighlight': ['TermPopupBorder'],
+        \ 'titlehighlight': ['TermPopupTitle']
         \ })
 
-  highlight PopupColor guifg=#78DBA9 
   let s:prompt = '󰊠  '
   let s:log = ['Type a shell command and press <Enter>.',
-        \ 'Type "clear" to reset, "exit" or <C-c to close.',
+        \ 'Type "clear" to reset, "exit" or <C-c> to close.',
         \ '',
         \ s:prompt]
   call popup_settext(s:popup_id, s:log)
