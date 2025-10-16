@@ -15,7 +15,7 @@ function! termp#open() abort
   let height = float2nr(&lines   * 0.6)
   let line   = (&lines   - height) / 2
   let col    = (&columns - width)  / 2
-  let toptitle    = '  termp '
+  let toptitle    = '  termp.vim '
   let user_directory = expand('~')
   let full_title = toptitle . '   ' . user_directory
 
@@ -35,7 +35,7 @@ function! termp#open() abort
         \ })
 
   highlight PopupColor guifg=#78DBA9 
-  let s:prompt = '󰊠 $ '
+  let s:prompt = '󰊠  '
   let s:log = ['Type a shell command and press <Enter>.',
         \ 'Type "clear" to reset, "exit" or <C-c to close.',
         \ '',
