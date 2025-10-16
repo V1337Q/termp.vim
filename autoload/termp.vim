@@ -5,6 +5,7 @@ let g:loaded_termp = 1
 
 let s:popup_id = -1
 let s:current_input = ''
+let g:prompt = '󰊠 $ '
 
 function! termp#open() abort
   if s:popup_id != -1
@@ -15,7 +16,9 @@ function! termp#open() abort
   let height = float2nr(&lines   * 0.6)
   let line   = (&lines   - height) / 2
   let col    = (&columns - width)  / 2
-  let toptitle    = 'termp'
+  let toptitle    = '  termp '
+  let user_directory = expand('~')
+  let full_title = toptitle . '   ' . user_directory
 
   let s:popup_id = popup_create([], {
         \ 'line': line,
@@ -24,17 +27,20 @@ function! termp#open() abort
         \ 'minheight': height,
         \ 'border': [1,1,1,1],
         \ 'borderchars': ['─','│','─','│','┌','┐','┘','└'],
-        \ 'title': toptitle,
+        \ 'title': full_title,
         \ 'wrap': v:true,
         \ 'mapping': 0,
         \ 'filter': 'termp#filter',
-        \ 'callback': 'termp#close_cb'
+        \ 'callback': 'termp#close_cb',
+        \ 'highlight': 'PopupColor'  
         \ })
 
+  highlight PopupColor guifg=#78DBA9 
+  let s:prompt = '󰊠 $ '
   let s:log = ['Type a shell command and press <Enter>.',
         \ 'Type "clear" to reset, "exit" or <C-c to close.',
         \ '',
-        \ '> ']
+        \ s:prompt]
   call popup_settext(s:popup_id, s:log)
 endfunction
 
@@ -47,7 +53,7 @@ function! termp#filter(id, key) abort
     elseif s:current_input ==# 'clear'
       let s:log = ['Type a shell command and press <Enter>.',
             \ 'Type "clear" to reset, "exit" or <C-c> to close.',
-            \ '', '> ']
+            \ '', s:prompt]
       let s:current_input = ''
       call popup_settext(a:id, s:log)
       return 1
@@ -79,12 +85,12 @@ function! termp#run(id, cmd) abort
   if v:shell_error
     call add(out, '[exit code: ' . v:shell_error . ']')
   endif
-  call extend(s:log, ['$ ' . a:cmd] + out + ['> '])
+  call extend(s:log, ['$ ' . a:cmd] + out + [s:prompt])
   call popup_settext(a:id, s:log)
 endfunction
 
 function! termp#redraw() abort
-  let s:log[-1] = '> ' . s:current_input
+  let s:log[-1] = s:prompt . s:current_input
   call popup_settext(s:popup_id, s:log)
 endfunction
 
