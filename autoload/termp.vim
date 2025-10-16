@@ -5,7 +5,6 @@ let g:loaded_termp = 1
 
 let s:popup_id = -1
 let s:current_input = ''
-let g:prompt = '󰊠 $ '
 
 function! termp#open() abort
   if s:popup_id != -1
